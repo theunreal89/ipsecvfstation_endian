@@ -1,0 +1,30 @@
+#!/bin/bash
+# Script to keep IPsec tunnel aligned with leftid proposed by Vodafone Power Station
+# , because Vodafone Power Station is dumb and cannot set the hostname instead of its public IP
+
+VFSTATIONIP=""
+VPNCONNNAME=""
+HOSTNAME=""
+COMMAND="dig $HOSTNAME +short | grep -v [a-z,A-Z] | sort"
+VPNFILE="/var/efw/vpn/config"
+VPNSTRING=$(grep "$VPNCONNNAME" $VPNFILE)
+VPNSTRINGLN=$(grep -n "$VPNCONNNAME" $VPNFILE | cut -d':' -f 1)
+OLDVPNIP=$(grep "$VPNCONNNAME" $VPNFILE | cut -d',' -f 11)
+NEWVPNIP=($(eval $COMMAND))
+
+ping -c 3 $VFSTATIONIP 
+if [[ $? == 0 ]]; then 
+	echo "Vodafone Station is reachable, will not change anything..."
+	exit 0
+else
+	echo "Vodafone station is not reachable! Will reset the tunnel with the new public IP"
+	echo "Applying $NEWVPNIP new IP to $VPNCONNNAME IPsec profile..."
+	if [[ ! -z $NEWVPNIP ]]; then
+		sed -i -l $VPNSTRINGLN "s/$OLDVPNIP/$NEWVPNIP/g" $VPNFILE
+		jobcontrol restart ipsec --force
+	else
+		echo "Couldn't resolve new IP, skipping..."
+	fi
+fi
+
+exit $?
