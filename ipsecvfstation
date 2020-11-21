@@ -12,7 +12,7 @@ VPNSTRINGLN=$(grep -n "$VPNCONNNAME" $VPNFILE | cut -d':' -f 1)
 OLDVPNIP=$(grep "$VPNCONNNAME" $VPNFILE | cut -d',' -f 11)
 NEWVPNIP=($(eval $COMMAND))
 
-ping -c 3 $VFSTATIONIP 
+ping -q -c 3 $VFSTATIONIP 
 if [[ $? == 0 ]]; then 
 	echo "Vodafone Station is reachable, will not change anything..."
 	exit 0
