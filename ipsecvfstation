@@ -9,7 +9,7 @@ COMMAND="dig $HOSTNAME +short | grep -v [a-z,A-Z] | sort"
 VPNFILE="/var/efw/vpn/config"
 VPNSTRING=$(grep "$VPNCONNNAME" $VPNFILE)
 VPNSTRINGLN=$(grep -n "$VPNCONNNAME" $VPNFILE | cut -d':' -f 1)
-OLDVPNIP=$(grep "$VPNCONNNAME" $VPNFILE | cut -d',' -f 11)
+OLDVPNIP=$(grep "$VPNCONNNAME" $VPNFILE | cut -d',' -f 12)
 NEWVPNIP=($(eval $COMMAND))
 
 ping -q -c 3 $VFSTATIONIP 
