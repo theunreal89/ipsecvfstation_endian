@@ -7,23 +7,28 @@ VPNCONNNAME=""
 HOSTNAME=""
 COMMAND="dig $HOSTNAME +short | grep -v [a-z,A-Z] | sort"
 VPNFILE="/var/efw/vpn/config"
+VPNCONFFILE="/etc/ipsec/ipsec.conf"
 VPNSTRING=$(grep "$VPNCONNNAME" $VPNFILE)
 VPNSTRINGLN=$(grep -n "$VPNCONNNAME" $VPNFILE | cut -d':' -f 1)
 OLDVPNIP=$(grep "$VPNCONNNAME" $VPNFILE | cut -d',' -f 12)
 NEWVPNIP=($(eval $COMMAND))
 
 ping -q -c 3 $VFSTATIONIP 
-if [[ $? == 0 ]]; then 
+if [ $? == 0 ]; then 
 	echo "Vodafone Station is reachable, will not change anything..."
 	exit 0
 else
 	echo "Vodafone station is not reachable! Will reset the tunnel with the new public IP"
 	echo "Applying $NEWVPNIP new IP to $VPNCONNNAME IPsec profile..."
-	if [[ ! -z $NEWVPNIP ]]; then
+	if [ ! -z ${NEWVPNIP} ] && [ ${NEWVPNIP} != ${OLDVPNIP} ]; then
 		sed -i -l $VPNSTRINGLN "s/$OLDVPNIP/$NEWVPNIP/g" $VPNFILE
-		jobcontrol restart ipsec --force
+		sed -i "s/$OLDVPNIP/$NEWVPNIP/g" $VPNCONFFILE
+		/usr/sbin/ipsec reload
+		/sbin/jobcontrol call ipsec.reset_connection --name $VPNCONNNAME
+		#/sbin/jobcontrol restart ipsec --force
 	else
-		echo "Couldn't resolve new IP, skipping..."
+		if [ -z ${NEWVPNIP} ]; then echo "Couldn't resolve new IP, skipping..."; fi
+		if [ ${NEWVPNIP} == ${OLDVPNIP} ]; then echo "IP is the same as the old one, skipping..."; fi
 	fi
 fi
 
