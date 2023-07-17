@@ -3,7 +3,12 @@ Script to keep IPsec Endian tunnel aligned with leftid parameter proposed by Vod
 
 The script needs to be properly modified with you own configuration needs, by modifying the following variables:
 
-VFSTATIONIP: Vodafone Station private IP (es. 192.168.3.1).  
-VPNCONNNAME: The name of Endian IPsec tunnel, as seen and defined from GUI.  
-HOSTNAME: DDNS hostname associated to Vodafone Station public IP (es. vfstation.myddns.me).  
+VFSTATIONIP 
+VPNCONNNAME  
+HOSTNAME  
 VPNFILE: Endian VPN file configuration path, you should not need to modify it unless some upgrades has changed its location.
+VFSTATIONIP: Vodafone Station private IP (es. 192.168.3.1). 
+VPNCONNNAME: The name of Endian IPsec tunnel, as seen and defined from GUI.
+REMOTEHOSTNAME: DDNS hostname associated to Vodafone Station public IP (es. vfstation.myddns.me).
+REMOTEDNS: Remote DNS server that you want to use to resolve the DDNS hostnames. This is useful to avoid using local DNS cache, and to be sure the DDNS hostname is immediately resolved with the updated public IP.
+MYHOSTNAME: Local DDNS hostname, this is needed to put the updated resolved local public IP as local ID of the IPsec connection, Vodafone Station requires it (it doesn't accept the DDNS hostname)
