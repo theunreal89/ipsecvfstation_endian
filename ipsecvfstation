@@ -11,6 +11,7 @@ COMMAND="dig $REMOTEHOSTNAME @$REMOTEDNS +short | grep -v [a-z,A-Z] | sort"
 MYCOMMAND="dig $MYHOSTNAME @$REMOTEDNS +short | grep -v [a-z,A-Z] | sort"
 VPNFILE="/var/efw/vpn/config"
 VPNCONFFILE="/etc/ipsec/ipsec.conf"
+VPNSECRFILE="/etc/ipsec/ipsec.secrets"
 IPSECTUNNENABLED=$(grep "$VPNCONNNAME" $VPNFILE | cut -d',' -f 2)
 VPNSTRING=$(grep "$VPNCONNNAME" $VPNFILE)
 VPNSTRINGLN=$(grep -n "$VPNCONNNAME" $VPNFILE | cut -d':' -f 1)
@@ -30,7 +31,10 @@ if [ ${IPSECTUNNENABLED} == 'on' ]; then
 		if [ ! -z ${NEWVPNIP} ] && [ ${NEWVPNIP} != ${OLDVPNIP} ]; then
 			sed -i -l $VPNSTRINGLN "s/$OLDVPNIP/$NEWVPNIP/g" $VPNFILE
 			sed -i "s/$OLDVPNIP/$NEWVPNIP/g" $VPNCONFFILE
+			sed -i "s/$OLDVPNIP/$NEWVPNIP/g" $VPNSECRFILE
 			/usr/sbin/ipsec reload
+			/usr/sbin/ipsec rereadsecrets 
+			/usr/sbin/ipsec down CasaAndrea
 			/sbin/jobcontrol call ipsec.reset_connection --name $VPNCONNNAME
 			#/sbin/jobcontrol restart ipsec --force
 		else
@@ -40,7 +44,9 @@ if [ ${IPSECTUNNENABLED} == 'on' ]; then
 		if [ ! -z ${MYNEWVPNIP} ] && [ ${MYNEWVPNIP} != ${MYOLDVPNIP} ]; then
 			sed -i -l $VPNSTRINGLN "s/$MYOLDVPNIP/$MYNEWVPNIP/g" $VPNFILE
 			sed -i "s/$MYOLDVPNIP/$MYNEWVPNIP/g" $VPNCONFFILE
+			sed -i "s/$MYOLDVPNIP/$MYNEWVPNIP/g" $VPNSECRFILE
 			/usr/sbin/ipsec reload
+			/usr/sbin/ipsec rereadsecrets 
 			/usr/sbin/ipsec down CasaAndrea
 			/sbin/jobcontrol call ipsec.reset_connection --name $VPNCONNNAME
 			#/sbin/jobcontrol restart ipsec --force
