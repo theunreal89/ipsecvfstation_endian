@@ -34,7 +34,7 @@ if [ ${IPSECTUNNENABLED} == 'on' ]; then
 			sed -i "s/$OLDVPNIP/$NEWVPNIP/g" $VPNSECRFILE
 			/usr/sbin/ipsec reload
 			/usr/sbin/ipsec rereadsecrets 
-			/usr/sbin/ipsec down CasaAndrea
+			/usr/sbin/ipsec down $VPNCONNNAME
 			/sbin/jobcontrol call ipsec.reset_connection --name $VPNCONNNAME
 			#/sbin/jobcontrol restart ipsec --force
 		else
@@ -47,7 +47,7 @@ if [ ${IPSECTUNNENABLED} == 'on' ]; then
 			sed -i "s/$MYOLDVPNIP/$MYNEWVPNIP/g" $VPNSECRFILE
 			/usr/sbin/ipsec reload
 			/usr/sbin/ipsec rereadsecrets 
-			/usr/sbin/ipsec down CasaAndrea
+			/usr/sbin/ipsec down $VPNCONNNAME
 			/sbin/jobcontrol call ipsec.reset_connection --name $VPNCONNNAME
 			#/sbin/jobcontrol restart ipsec --force
 		else
